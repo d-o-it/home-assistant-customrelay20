@@ -10,32 +10,27 @@ _TIMEOUT = 3.0
 
 
 class CustomRelay20:
-    def __init__(self, serial: serialio, repeat=0, wait=0) -> None:
+    def __init__(self, serial: serialio) -> None:
         self.serial = serial
         self.serial_lock = asyncio.Lock()
-        self.repeat = repeat
-        self.wait = wait
 
-    async def __worker(self, cmd):
+    async def __worker(self, cmd: int):
         try:
             await self.serial.open()
-
-            for i in range(self.repeat + 1):
-                data = bytearray([cmd])
-                _LOGGER.debug("Sending %s", data.hex())
-                await self.serial.write(data)
-                await asyncio.sleep(self.wait)
+            data = bytearray([cmd])
+            _LOGGER.debug("Sending %s", data.hex())
+            await self.serial.write(data)
         finally:
             await self.serial.close()
 
-    async def __process(self, cmd):
+    async def __process(self, cmd: int):
         await self.serial_lock.acquire()
         try:
             await asyncio.wait_for(self.__worker(cmd), _TIMEOUT)
         finally:
             self.serial_lock.release()
 
-    async def set(self, card, relay):
+    async def set(self, card: int, relay: int):
         """Set `relay` of `card`."""
         _LOGGER.info("Switch on card %i relay %i", card, relay)
         if not 0 < relay < 21:
@@ -43,7 +38,7 @@ class CustomRelay20:
 
         await self.__process(relay & 255)
 
-    async def clear(self, card, relay):
+    async def clear(self, card: int, relay: int):
         """Clear `relay` of `card`."""
         _LOGGER.info("Switch off card %i relay %i", card, relay)
         if not 0 < relay < 21:

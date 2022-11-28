@@ -8,7 +8,7 @@ import voluptuous as vol
 import serialio
 
 from homeassistant import config_entries
-from homeassistant.const import CONF_COUNT, CONF_URL
+from homeassistant.const import CONF_URL
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
